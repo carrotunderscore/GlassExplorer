@@ -1,0 +1,585 @@
+<Window x:Class="GlassExplorer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:GlassExplorer"
+        Title="Explorer" Width="1180" Height="740" MinWidth="760" MinHeight="460"
+        WindowStyle="None" ResizeMode="CanResize" Background="Transparent"
+        WindowStartupLocation="CenterScreen" FontFamily="Segoe UI"
+        Foreground="{StaticResource TextPrimary}" UseLayoutRounding="True">
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="150" ResizeBorderThickness="6" GlassFrameThickness="0"
+                      CornerRadius="16" UseAeroCaptionButtons="False"/>
+    </WindowChrome.WindowChrome>
+
+    <Window.Resources>
+        <!-- Mappkort (brett, som "World Time"-kortet) -->
+        <DataTemplate x:Key="FolderCard">
+            <Grid Width="244" Height="70" Margin="16,0,14,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="42"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Image Source="{Binding Icon}" Width="38" Height="38" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality"/>
+                <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="{Binding Subtitle}" FontSize="12" Foreground="{StaticResource TextSecondary}" Margin="0,2,0,0" TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <!-- Filkort (kvadratiskt, som "Day Number"-kortet) -->
+        <DataTemplate x:Key="FileCard">
+            <StackPanel Width="122" Height="138" Margin="8,12,8,8">
+                <Grid Height="76">
+                    <Image Source="{Binding Icon}" MaxWidth="108" MaxHeight="76" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality"/>
+                </Grid>
+                <TextBlock Text="{Binding Name}" TextAlignment="Center" TextWrapping="Wrap" MaxHeight="34" TextTrimming="CharacterEllipsis"
+                           Margin="0,8,0,0" FontSize="12.5"/>
+                <TextBlock Text="{Binding SizeText}" TextAlignment="Center" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,2,0,0"/>
+            </StackPanel>
+        </DataTemplate>
+
+        <!-- Enhetskort med ring (som "Todos"-ringen) -->
+        <DataTemplate x:Key="DriveCard">
+            <Grid Width="244" Height="86" Margin="16,0,14,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="52"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid Width="50" Height="50" VerticalAlignment="Center">
+                    <Ellipse Stroke="#22FFFFFF" StrokeThickness="5"/>
+                    <Ellipse Stroke="{Binding RingBrush}" StrokeThickness="5" StrokeDashArray="{Binding RingDash}"
+                             StrokeDashCap="Round" RenderTransformOrigin="0.5,0.5">
+                        <Ellipse.RenderTransform>
+                            <RotateTransform Angle="-90"/>
+                        </Ellipse.RenderTransform>
+                    </Ellipse>
+                    <TextBlock Text="{Binding PercentText}" FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Grid>
+                <StackPanel Grid.Column="1" Margin="14,0,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="{Binding UsageText}" FontSize="12" Foreground="{StaticResource TextSecondary}" Margin="0,2,0,0" TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <local:CardSelector x:Key="CardSelector" Folder="{StaticResource FolderCard}" File="{StaticResource FileCard}" Drive="{StaticResource DriveCard}"/>
+
+        <DataTemplate x:Key="RowTemplate">
+            <Grid Height="36" Margin="10,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="30"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="170"/>
+                    <ColumnDefinition Width="90"/>
+                </Grid.ColumnDefinitions>
+                <Image Source="{Binding Icon}" Width="20" Height="20" RenderOptions.BitmapScalingMode="HighQuality"/>
+                <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" FontSize="13" TextTrimming="CharacterEllipsis" Margin="6,0,12,0"/>
+                <TextBlock Grid.Column="2" Text="{Binding ModifiedText}" VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource TextSecondary}"/>
+                <TextBlock Grid.Column="3" Text="{Binding TypeText}" VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource TextSecondary}" TextTrimming="CharacterEllipsis" Margin="0,0,10,0"/>
+                <TextBlock Grid.Column="4" Text="{Binding SizeText}" VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource TextSecondary}" HorizontalAlignment="Right"/>
+            </Grid>
+        </DataTemplate>
+
+        <Style x:Key="MiniButton" TargetType="Button">
+            <Setter Property="Width" Value="24"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="FontFamily" Value="{StaticResource Icons}"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" CornerRadius="7" Background="Transparent">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#26FFFFFF"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Tab in the tab strip -->
+        <DataTemplate x:Key="TabTemplate">
+            <Border x:Name="Bd" Height="32" MinWidth="130" MaxWidth="230" CornerRadius="10" Margin="0,0,6,0" Background="Transparent"
+                    BorderBrush="Transparent" BorderThickness="1" WindowChrome.IsHitTestVisibleInChrome="True"
+                    MouseLeftButtonDown="Tab_MouseDown" MouseUp="Tab_MouseUp" MouseRightButtonUp="Tab_RightClick"
+                    ToolTip="{Binding ToolTipText}" ToolTipService.InitialShowDelay="900">
+                <DockPanel Margin="12,0,5,0">
+                    <Button x:Name="X" DockPanel.Dock="Right" Style="{StaticResource MiniButton}" Content="&#xE711;" Width="22" Height="22" FontSize="8"
+                            Margin="6,0,0,0" Opacity="0" Click="TabClose_Click" ToolTip="Close tab (Ctrl+W)"/>
+                    <TextBlock x:Name="G" Text="{Binding Glyph}" FontFamily="{StaticResource Icons}" FontSize="12" Foreground="#8FB8FF"
+                               VerticalAlignment="Center" Margin="0,0,9,0"/>
+                    <TextBlock x:Name="T" Text="{Binding Title}" FontSize="12.5" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                               Foreground="{StaticResource TextSecondary}"/>
+                </DockPanel>
+            </Border>
+            <DataTemplate.Triggers>
+                <Trigger SourceName="Bd" Property="IsMouseOver" Value="True">
+                    <Setter TargetName="Bd" Property="Background" Value="#10FFFFFF"/>
+                    <Setter TargetName="X" Property="Opacity" Value="1"/>
+                </Trigger>
+                <DataTrigger Binding="{Binding IsActive}" Value="True">
+                    <Setter TargetName="Bd" Property="Background" Value="{StaticResource ControlBg}"/>
+                    <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource ControlBorder}"/>
+                    <Setter TargetName="X" Property="Opacity" Value="1"/>
+                    <Setter TargetName="T" Property="Foreground" Value="{StaticResource TextPrimary}"/>
+                    <Setter TargetName="G" Property="Foreground" Value="White"/>
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+
+        <!-- Item inside an expanded sidebar entry (recent folders/files inside it) -->
+        <DataTemplate x:Key="SideChild">
+            <Grid x:Name="Row">
+                <Button Style="{StaticResource SideButton}" Height="30" Click="Side_Click" MouseRightButtonUp="Side_RightClick" ToolTip="{Binding ToolTipText}">
+                    <Grid Margin="0,0,26,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="24"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock x:Name="G" Text="{Binding Glyph}" FontFamily="{StaticResource Icons}" FontSize="12" Foreground="{Binding GlyphBrush}" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="N" Grid.Column="1" Text="{Binding Name}" FontSize="12.5" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                    </Grid>
+                </Button>
+                <Button x:Name="Pin" Style="{StaticResource MiniButton}" HorizontalAlignment="Right" Margin="0,0,4,0" Content="{Binding PinGlyph}"
+                        ToolTip="{Binding PinTip}" Click="SidePin_Click" Visibility="Collapsed"/>
+            </Grid>
+            <DataTemplate.Triggers>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding IsMouseOver, ElementName=Row}" Value="True"/>
+                        <Condition Binding="{Binding CanPin}" Value="True"/>
+                    </MultiDataTrigger.Conditions>
+                    <Setter TargetName="Pin" Property="Visibility" Value="Visible"/>
+                </MultiDataTrigger>
+                <DataTrigger Binding="{Binding IsPlaceholder}" Value="True">
+                    <Setter TargetName="N" Property="Foreground" Value="{StaticResource TextTertiary}"/>
+                    <Setter TargetName="N" Property="FontStyle" Value="Italic"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsActive}" Value="True">
+                    <Setter TargetName="G" Property="Foreground" Value="White"/>
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+
+        <!-- Sidebar entry with optional pin button and expand chevron -->
+        <DataTemplate x:Key="SideItem">
+            <StackPanel>
+                <Grid x:Name="Row">
+                    <Button Style="{StaticResource SideButton}" Click="Side_Click" MouseRightButtonUp="Side_RightClick" ToolTip="{Binding ToolTipText}"
+                            ToolTipService.InitialShowDelay="1200">
+                        <Grid Margin="0,0,52,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="30"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock x:Name="G" Text="{Binding Glyph}" FontFamily="{StaticResource Icons}" FontSize="15" Foreground="{Binding GlyphBrush}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="13.5" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                        </Grid>
+                    </Button>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,5,0">
+                        <Button x:Name="Pin" Style="{StaticResource MiniButton}" Content="{Binding PinGlyph}" ToolTip="{Binding PinTip}"
+                                Click="SidePin_Click" Visibility="Collapsed"/>
+                        <Button x:Name="Chevron" Style="{StaticResource MiniButton}" Content="{Binding ChevronGlyph}" ToolTip="Recent items inside"
+                                Click="SideExpand_Click" Visibility="{Binding ExpandVisibility}" Opacity="0.55"/>
+                    </StackPanel>
+                </Grid>
+                <Border Margin="21,0,0,4" Padding="6,0,0,0" BorderBrush="#1AFFFFFF" BorderThickness="1,0,0,0" Visibility="{Binding ChildrenVisibility}">
+                    <ItemsControl ItemsSource="{Binding Children}" ItemTemplate="{StaticResource SideChild}" Focusable="False"/>
+                </Border>
+            </StackPanel>
+            <DataTemplate.Triggers>
+                <Trigger SourceName="Row" Property="IsMouseOver" Value="True">
+                    <Setter TargetName="Chevron" Property="Opacity" Value="1"/>
+                </Trigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding IsMouseOver, ElementName=Row}" Value="True"/>
+                        <Condition Binding="{Binding CanPin}" Value="True"/>
+                    </MultiDataTrigger.Conditions>
+                    <Setter TargetName="Pin" Property="Visibility" Value="Visible"/>
+                </MultiDataTrigger>
+                <DataTrigger Binding="{Binding IsExpanded}" Value="True">
+                    <Setter TargetName="Chevron" Property="Opacity" Value="1"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsActive}" Value="True">
+                    <Setter TargetName="G" Property="Foreground" Value="White"/>
+                    <Setter TargetName="Chevron" Property="Foreground" Value="White"/>
+                    <Setter TargetName="Pin" Property="Foreground" Value="White"/>
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SideDrive">
+            <Button Style="{StaticResource SideButton}" Height="52" Click="Side_Click">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="30"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock x:Name="G" Text="&#xEDA2;" FontFamily="{StaticResource Icons}" FontSize="15" Foreground="#8FB8FF" VerticalAlignment="Center"/>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Name}" FontSize="13.5" TextTrimming="CharacterEllipsis"/>
+                        <Grid Height="4" Margin="0,6,4,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="{Binding UsedStar}"/>
+                                <ColumnDefinition Width="{Binding FreeStar}"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.ColumnSpan="2" CornerRadius="2" Background="#24FFFFFF"/>
+                            <Border CornerRadius="2" Background="{Binding BarBrush}"/>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+            </Button>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsActive}" Value="True">
+                    <Setter TargetName="G" Property="Foreground" Value="White"/>
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+
+        <!-- This PC: drive card with ring + bar -->
+        <DataTemplate x:Key="PcDriveCard">
+            <Grid Width="286" Height="92" Margin="16,0,16,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="54"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid Width="52" Height="52" VerticalAlignment="Center">
+                    <Ellipse Stroke="#22FFFFFF" StrokeThickness="5"/>
+                    <Ellipse Stroke="{Binding RingBrush}" StrokeThickness="5" StrokeDashArray="{Binding RingDash}" StrokeDashCap="Round" RenderTransformOrigin="0.5,0.5">
+                        <Ellipse.RenderTransform>
+                            <RotateTransform Angle="-90"/>
+                        </Ellipse.RenderTransform>
+                    </Ellipse>
+                    <TextBlock Text="{Binding PercentText}" FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Grid>
+                <StackPanel Grid.Column="1" Margin="14,0,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="{Binding UsageText}" FontSize="12" Foreground="{StaticResource TextSecondary}" Margin="0,2,0,0"/>
+                    <Grid Height="6" Margin="0,9,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="{Binding UsedStar}"/>
+                            <ColumnDefinition Width="{Binding FreeStar}"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.ColumnSpan="2" CornerRadius="3" Background="#24FFFFFF"/>
+                        <Border CornerRadius="3" Background="{Binding RingBrush}"/>
+                    </Grid>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <!-- This PC: "largest folders" row -->
+        <DataTemplate x:Key="SizeRow">
+            <Grid Margin="10,7,10,7" Background="Transparent" ToolTip="{Binding ToolTipText}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Right" Text="{Binding SizeText}" FontSize="12" Foreground="{StaticResource TextSecondary}" Margin="10,0,0,0"/>
+                    <Border DockPanel.Dock="Left" Width="10" Height="10" CornerRadius="3" Background="{Binding Brush}" Margin="0,0,9,0"/>
+                    <TextBlock Text="{Binding Name}" FontSize="13" TextTrimming="CharacterEllipsis"/>
+                </DockPanel>
+                <Grid Grid.Row="1" Height="4" Margin="19,6,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="{Binding BarStar}"/>
+                        <ColumnDefinition Width="{Binding RestStar}"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Grid.ColumnSpan="2" CornerRadius="2" Background="#1AFFFFFF"/>
+                    <Border CornerRadius="2" Background="{Binding Brush}"/>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="ScanCrumbTemplate">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="&#xE76C;" FontFamily="{StaticResource Icons}" FontSize="9" Foreground="{StaticResource TextTertiary}"
+                           VerticalAlignment="Center" Margin="1,1,1,0" Visibility="{Binding ChevronVisibility}"/>
+                <Button Style="{StaticResource CrumbButton}" Tag="{Binding Node}" Click="ScanCrumb_Click">
+                    <TextBlock Text="{Binding Name}" MaxWidth="200" TextTrimming="CharacterEllipsis"/>
+                </Button>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate x:Key="CrumbTemplate">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="&#xE76C;" FontFamily="{StaticResource Icons}" FontSize="9" Foreground="{StaticResource TextTertiary}"
+                           VerticalAlignment="Center" Margin="1,1,1,0" Visibility="{Binding ChevronVisibility}"/>
+                <Button Style="{StaticResource CrumbButton}" Tag="{Binding Path}" Click="Crumb_Click">
+                    <TextBlock Text="{Binding Name}" MaxWidth="220" TextTrimming="CharacterEllipsis"/>
+                </Button>
+            </StackPanel>
+        </DataTemplate>
+
+        <Style x:Key="SideHeader" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11.5"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{StaticResource TextTertiary}"/>
+            <Setter Property="Margin" Value="10,18,0,6"/>
+        </Style>
+    </Window.Resources>
+
+    <Border x:Name="RootBorder" CornerRadius="16" Background="{StaticResource WindowTint}" BorderBrush="#30FFFFFF" BorderThickness="1">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ============ Sidopanel ============ -->
+            <Border x:Name="Sidebar" Background="{StaticResource SidebarTint}" BorderBrush="#14FFFFFF" BorderThickness="0,0,1,0" CornerRadius="15,0,0,15">
+                <DockPanel Margin="14,16,12,14" WindowChrome.IsHitTestVisibleInChrome="True">
+                    <TextBox x:Name="SearchBox" DockPanel.Dock="Top" Height="38" Style="{StaticResource SearchBox}" Tag="Search"
+                             TextChanged="SearchBox_TextChanged" KeyDown="SearchBox_KeyDown"/>
+                    <ScrollViewer x:Name="SideScroll" VerticalScrollBarVisibility="Auto" Margin="0,10,-8,0" Padding="0,0,8,0" Focusable="False">
+                        <StackPanel>
+                            <ItemsControl x:Name="PlacesList" ItemTemplate="{StaticResource SideItem}" Focusable="False"/>
+                            <TextBlock x:Name="PinnedHeader" Text="Pinned" Style="{StaticResource SideHeader}"/>
+                            <ItemsControl x:Name="PinnedList" ItemTemplate="{StaticResource SideItem}" Focusable="False"/>
+                            <TextBlock x:Name="RecentHeader" Text="Recent" Style="{StaticResource SideHeader}"/>
+                            <ItemsControl x:Name="RecentList" ItemTemplate="{StaticResource SideItem}" Focusable="False"/>
+                            <Border Height="1" Background="#14FFFFFF" Margin="10,14,10,10"/>
+                            <ItemsControl x:Name="ThisPcList" ItemTemplate="{StaticResource SideItem}" Focusable="False"/>
+                            <ItemsControl x:Name="DrivesList" ItemTemplate="{StaticResource SideDrive}" Focusable="False" Margin="14,0,0,0"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
+
+            <!-- ============ Huvudyta ============ -->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <!-- Tab strip + window buttons -->
+                <Grid x:Name="TabBar" Background="Transparent" Margin="14,10,14,0" Height="34">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <ScrollViewer x:Name="TabScroll" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" Focusable="False"
+                                  HorizontalAlignment="Left">
+                        <StackPanel Orientation="Horizontal">
+                            <ItemsControl x:Name="TabsList" ItemTemplate="{StaticResource TabTemplate}" Focusable="False">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                            <Button Style="{StaticResource IconButton}" Width="30" Height="30" FontSize="12" Content="&#xE710;" ToolTip="New tab (Ctrl+T)"
+                                    Click="NewTab_Click" WindowChrome.IsHitTestVisibleInChrome="True"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="12,0,0,0" VerticalAlignment="Center" WindowChrome.IsHitTestVisibleInChrome="True">
+                        <Button Style="{StaticResource CircleButton}" Content="&#xE921;" Margin="0,0,6,0" Click="Min_Click" ToolTip="Minimize"/>
+                        <Button x:Name="MaxBtn" Style="{StaticResource CircleButton}" Content="&#xE922;" Margin="0,0,6,0" Click="Max_Click" ToolTip="Maximize"/>
+                        <Button Style="{StaticResource CloseButton}" Content="&#xE8BB;" Click="Close_Click" ToolTip="Close"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Topprad: navigering, adressfält, verktyg -->
+                <Grid x:Name="TopBar" Grid.Row="1" Background="Transparent" Margin="18,8,14,0" Height="40">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" WindowChrome.IsHitTestVisibleInChrome="True">
+                        <Button x:Name="BackBtn" Style="{StaticResource IconButton}" Content="&#xE72B;" ToolTip="Back (Alt+Left)" Click="Back_Click"/>
+                        <Button x:Name="FwdBtn" Style="{StaticResource IconButton}" Content="&#xE72A;" ToolTip="Forward (Alt+Right)" Click="Forward_Click"/>
+                        <Button x:Name="UpBtn" Style="{StaticResource IconButton}" Content="&#xE74A;" ToolTip="Up one level (Alt+Up)" Click="Up_Click"/>
+                        <Button Style="{StaticResource IconButton}" Content="&#xE72C;" ToolTip="Refresh (F5)" Click="Refresh_Click"/>
+                    </StackPanel>
+
+                    <Border x:Name="AddressBorder" Grid.Column="1" Margin="10,0,10,0" Height="38" CornerRadius="19"
+                            Background="{StaticResource ControlBg}" BorderBrush="{StaticResource ControlBorder}" BorderThickness="1"
+                            MouseLeftButtonDown="Address_MouseDown" Cursor="IBeam" WindowChrome.IsHitTestVisibleInChrome="True">
+                        <Grid Margin="8,0,12,0" ClipToBounds="True">
+                            <ScrollViewer x:Name="CrumbScroll" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled"
+                                          Focusable="False" VerticalAlignment="Center">
+                                <ItemsControl x:Name="Crumbs" ItemTemplate="{StaticResource CrumbTemplate}" HorizontalAlignment="Left" Cursor="Arrow" Focusable="False">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                            </ScrollViewer>
+                            <TextBox x:Name="AddressBox" Style="{StaticResource PlainBox}" Visibility="Collapsed" Margin="6,0,0,0"
+                                     KeyDown="AddressBox_KeyDown" LostKeyboardFocus="AddressBox_LostFocus"/>
+                        </Grid>
+                    </Border>
+
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" WindowChrome.IsHitTestVisibleInChrome="True">
+                        <Button Style="{StaticResource IconButton}" Content="&#xE8F4;" ToolTip="New folder (Ctrl+Shift+N)" Click="NewFolder_Click"/>
+                        <Button x:Name="ViewBtn" Style="{StaticResource IconButton}" Content="&#xE8FD;" ToolTip="Change view" Click="View_Click"/>
+                        <Button Style="{StaticResource IconButton}" Content="&#xE8CB;" ToolTip="Sort" Click="Sort_Click"/>
+                        <Button Style="{StaticResource IconButton}" Content="&#xE712;" ToolTip="More" Click="More_Click"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Rubrik: "Dokument  [42]  3 mappar · 39 filer" -->
+                <DockPanel Grid.Row="2" Margin="30,16,30,14" Background="Transparent">
+                    <TextBlock x:Name="SelectionText" DockPanel.Dock="Right" VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource TextSecondary}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock x:Name="TitleText" FontSize="25" FontWeight="Bold" VerticalAlignment="Center"/>
+                        <Border CornerRadius="10" Background="#1FFFFFFF" Padding="8,1,8,2" Margin="12,3,0,0" VerticalAlignment="Center">
+                            <TextBlock x:Name="CountText" FontSize="12" FontWeight="SemiBold"/>
+                        </Border>
+                        <TextBlock x:Name="SubText" Margin="12,3,0,0" VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource TextSecondary}"/>
+                    </StackPanel>
+                </DockPanel>
+
+                <!-- Innehåll -->
+                <Grid x:Name="ContentHost" Grid.Row="3">
+                    <ListBox x:Name="GridList" Style="{StaticResource BareList}" SelectionMode="Extended" Padding="24,0,12,18"
+                             ItemContainerStyle="{StaticResource CardItem}" ItemTemplateSelector="{StaticResource CardSelector}"
+                             ScrollViewer.CanContentScroll="False" VirtualizingPanel.IsVirtualizing="False">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel/>
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListBox.GroupStyle>
+                            <GroupStyle>
+                                <GroupStyle.HeaderTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" Margin="4,6,0,12">
+                                            <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}"/>
+                                            <TextBlock Text="{Binding ItemCount}" FontSize="12" Margin="8,0,0,0" Foreground="{StaticResource TextTertiary}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </GroupStyle.HeaderTemplate>
+                            </GroupStyle>
+                        </ListBox.GroupStyle>
+                    </ListBox>
+
+                    <Grid x:Name="DetailsHost" Visibility="Collapsed">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid Margin="35,0,40,6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="30"/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="170"/>
+                                <ColumnDefinition Width="90"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="1" Style="{StaticResource HeaderButton}" Content="Name" Tag="name" Click="Header_Click" Margin="-2,0,0,0"/>
+                            <Button Grid.Column="2" Style="{StaticResource HeaderButton}" Content="Date modified" Tag="date" Click="Header_Click" Margin="-8,0,0,0"/>
+                            <Button Grid.Column="3" Style="{StaticResource HeaderButton}" Content="Type" Tag="type" Click="Header_Click" Margin="-8,0,0,0"/>
+                            <Button Grid.Column="4" Style="{StaticResource HeaderButton}" Content="Size" Tag="size" Click="Header_Click" HorizontalAlignment="Right" Margin="0,0,-8,0"/>
+                        </Grid>
+                        <ListBox x:Name="DetailList" Grid.Row="1" Style="{StaticResource BareList}" SelectionMode="Extended" Padding="24,0,24,18"
+                                 ItemContainerStyle="{StaticResource RowItem}" ItemTemplate="{StaticResource RowTemplate}"
+                                 ScrollViewer.CanContentScroll="True" VirtualizingPanel.IsVirtualizing="True"
+                                 VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.ScrollUnit="Pixel"/>
+                    </Grid>
+
+
+                    <!-- ============ This PC ============ -->
+                    <Grid x:Name="PcHost" Visibility="Collapsed" Margin="24,0,24,18">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <ListBox x:Name="PcDrives" Style="{StaticResource BareList}" ItemContainerStyle="{StaticResource CardItem}" AllowDrop="False"
+                                 ItemTemplate="{StaticResource PcDriveCard}" SelectionChanged="PcDrives_SelectionChanged" MouseDoubleClick="PcDrives_DoubleClick"
+                                 ScrollViewer.VerticalScrollBarVisibility="Disabled" MaxHeight="232">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel/>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                        </ListBox>
+
+                        <DockPanel Grid.Row="1" Margin="4,8,0,12">
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Button x:Name="ScanUpBtn" Style="{StaticResource IconButton}" Content="&#xE74A;" ToolTip="Up one level" Click="ScanUp_Click" Margin="0,0,6,0"/>
+                                <Button x:Name="ScanBtn" Style="{StaticResource PillButton}" Padding="16,6" Click="Scan_Click">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock x:Name="ScanBtnGlyph" Text="&#xE72C;" FontFamily="{StaticResource Icons}" FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <TextBlock x:Name="ScanBtnText" Text="Scan" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                            <TextBlock Text="Space usage" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <ItemsControl x:Name="ScanCrumbs" ItemTemplate="{StaticResource ScanCrumbTemplate}" VerticalAlignment="Center" Focusable="False">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </DockPanel>
+
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="14"/>
+                                <ColumnDefinition Width="320"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Border CornerRadius="14" Background="#0AFFFFFF" BorderBrush="{StaticResource CardBorder}" BorderThickness="1" Padding="5">
+                                <Grid>
+                                    <local:TreemapView x:Name="Treemap"/>
+                                    <StackPanel x:Name="ScanProgressPanel" VerticalAlignment="Center" HorizontalAlignment="Center" Width="340" Visibility="Collapsed">
+                                        <TextBlock x:Name="ScanProgressTitle" Text="Scanning…" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                                        <Grid Height="6" Margin="0,14,0,10">
+                                            <Border CornerRadius="3" Background="#22FFFFFF"/>
+                                            <Border x:Name="ScanProgressFill" CornerRadius="3" Background="{StaticResource AccentGradient}" HorizontalAlignment="Left" Width="0"/>
+                                        </Grid>
+                                        <TextBlock x:Name="ScanProgressText" FontSize="12" Foreground="{StaticResource TextSecondary}" HorizontalAlignment="Center" TextAlignment="Center"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                            <TextBlock x:Name="TreemapHover" Grid.Row="1" Margin="6,8,0,0" FontSize="12" Foreground="{StaticResource TextSecondary}" TextTrimming="CharacterEllipsis"
+                                       Text="Click a block to zoom in · right-click for more"/>
+                            <Border Grid.Column="2" Grid.RowSpan="2" CornerRadius="14" Background="{StaticResource CardBg}" BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+                                <DockPanel Margin="6,14,6,8">
+                                    <TextBlock DockPanel.Dock="Top" Text="Largest in this folder" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}" Margin="12,0,0,6"/>
+                                    <ListBox x:Name="SizeList" Style="{StaticResource BareList}" ItemContainerStyle="{StaticResource RowItem}" ItemTemplate="{StaticResource SizeRow}"
+                                             AllowDrop="False" ScrollViewer.CanContentScroll="False"
+                                             PreviewMouseLeftButtonUp="SizeList_Click" MouseRightButtonUp="SizeList_RightClick"/>
+                                </DockPanel>
+                            </Border>
+                        </Grid>
+                    </Grid>
+
+                    <StackPanel x:Name="EmptyPanel" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" IsHitTestVisible="False">
+                        <TextBlock Text="&#xE8B7;" FontFamily="{StaticResource Icons}" FontSize="44" Foreground="{StaticResource TextTertiary}" HorizontalAlignment="Center"/>
+                        <TextBlock x:Name="EmptyText" Text="This folder is empty" FontSize="14" Foreground="{StaticResource TextSecondary}" Margin="0,12,0,0" HorizontalAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- Rubber-band (click and drag) selection rectangle -->
+                    <Canvas x:Name="BandCanvas" IsHitTestVisible="False" ClipToBounds="True">
+                        <Border x:Name="BandRect" Visibility="Collapsed" CornerRadius="3" BorderThickness="1"
+                                Background="#2E4C9BFF" BorderBrush="#D04C9BFF"/>
+                    </Canvas>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>
