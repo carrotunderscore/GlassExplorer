@@ -10,7 +10,7 @@ and the **ModernGlass theme** in the [`theme`](theme) folder of this repo.
 
 ## Install
 
-1. Download `GlassExplorer-v1.0.0-win-x64.zip` from [Releases](https://github.com/carrotunderscore/GlassExplorer/releases/latest) and unzip it.
+1. Download `GlassExplorer-v1.1.0-win-x64.zip` from [Releases](https://github.com/carrotunderscore/GlassExplorer/releases/latest) and unzip it.
 2. Right-click **`Install.ps1`** and choose **Run with PowerShell**.
    - Copies the app to `%LOCALAPPDATA%\Programs\GlassExplorer` (no admin needed)
    - Installs the .NET 8 Desktop Runtime with `winget` if it's missing
