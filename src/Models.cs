@@ -158,6 +158,7 @@ namespace GlassExplorer
         public double Width { get; set; } = 1180;
         public double Height { get; set; } = 740;
         public bool Maximized { get; set; }
+        public double Opacity { get; set; } = 0.89;   // window glass: 0.3 (see-through) – 1 (solid)
 
         static string FilePath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "GlassExplorer", "settings.json");
 

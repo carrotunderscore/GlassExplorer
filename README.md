@@ -6,6 +6,8 @@ can't get rounded corners or a glass look, so this replaces it, with tabs, blur 
 Part of the **ModernGlass** set, together with [GlassBar](https://github.com/carrotunderscore/GlassBar)
 and the **ModernGlass theme** in the [`theme`](theme) folder of this repo.
 
+![GlassExplorer showing This PC over the desktop](docs/screenshot.png)
+
 ## Install
 
 1. Download `GlassExplorer-v1.0.0-win-x64.zip` from [Releases](https://github.com/carrotunderscore/GlassExplorer/releases/latest) and unzip it.
@@ -24,6 +26,8 @@ and the **ModernGlass theme** in the [`theme`](theme) folder of this repo.
 ## Features
 
 - Dark glass window with blurred background and rounded corners
+- **Opacity:** ⋯ (More) → Opacity sets how see-through the window is, separately from GlassBar
+- **Colour** follows the theme picked in GlassBar (⋯ → Colour), live
 - **Tabs:** Ctrl+T new tab, Ctrl+W close, Ctrl+Tab / Ctrl+Shift+Tab switch, middle-click a folder to open it in a new tab.
   Folders opened from other programs arrive as a new tab in the open window.
 - Card view and list view, image thumbnails, smooth scrolling

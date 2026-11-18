@@ -27,7 +27,7 @@ namespace GlassExplorer
                     CanExpand = path != Home
                 });
 
-            Add("", "#4C9BFF", "Home", Home);
+            Add("", GlassTheme.Current.Accent, "Home", Home);
             Add("", "#4FD1C5", "Desktop", Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory));
             Add("", "#5BD68A", "Downloads", Native.DownloadsFolder());
             Add("", "#6FA8FF", "Documents", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
@@ -106,7 +106,7 @@ namespace GlassExplorer
                     Name = DriveLabel(d), Path = d.RootDirectory.FullName,
                     ToolTipText = $"{Fmt.Size(d.TotalFreeSpace)} free of {Fmt.Size(d.TotalSize)}",
                     UsedStar = new GridLength(used, GridUnitType.Star), FreeStar = new GridLength(1 - used, GridUnitType.Star),
-                    BarBrush = Fmt.Frozen(used > 0.9 ? "#FF6B6B" : "#4C9BFF")
+                    BarBrush = Fmt.Frozen(used > 0.9 ? "#FF6B6B" : GlassTheme.Current.Accent)
                 });
             }
             DrivesList.ItemsSource = null;

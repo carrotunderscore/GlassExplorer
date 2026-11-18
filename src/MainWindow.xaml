@@ -330,7 +330,7 @@
         </Style>
     </Window.Resources>
 
-    <Border x:Name="RootBorder" CornerRadius="16" Background="{StaticResource WindowTint}" BorderBrush="#30FFFFFF" BorderThickness="1">
+    <Border x:Name="RootBorder" CornerRadius="16" Background="{DynamicResource WindowTint}" BorderBrush="#30FFFFFF" BorderThickness="1">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="250"/>
@@ -338,7 +338,7 @@
             </Grid.ColumnDefinitions>
 
             <!-- ============ Sidopanel ============ -->
-            <Border x:Name="Sidebar" Background="{StaticResource SidebarTint}" BorderBrush="#14FFFFFF" BorderThickness="0,0,1,0" CornerRadius="15,0,0,15">
+            <Border x:Name="Sidebar" Background="{DynamicResource SidebarTint}" BorderBrush="#14FFFFFF" BorderThickness="0,0,1,0" CornerRadius="15,0,0,15">
                 <DockPanel Margin="14,16,12,14" WindowChrome.IsHitTestVisibleInChrome="True">
                     <TextBox x:Name="SearchBox" DockPanel.Dock="Top" Height="38" Style="{StaticResource SearchBox}" Tag="Search"
                              TextChanged="SearchBox_TextChanged" KeyDown="SearchBox_KeyDown"/>
@@ -549,7 +549,7 @@
                                         <TextBlock x:Name="ScanProgressTitle" Text="Scanning…" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center"/>
                                         <Grid Height="6" Margin="0,14,0,10">
                                             <Border CornerRadius="3" Background="#22FFFFFF"/>
-                                            <Border x:Name="ScanProgressFill" CornerRadius="3" Background="{StaticResource AccentGradient}" HorizontalAlignment="Left" Width="0"/>
+                                            <Border x:Name="ScanProgressFill" CornerRadius="3" Background="{DynamicResource AccentGradient}" HorizontalAlignment="Left" Width="0"/>
                                         </Grid>
                                         <TextBlock x:Name="ScanProgressText" FontSize="12" Foreground="{StaticResource TextSecondary}" HorizontalAlignment="Center" TextAlignment="Center"/>
                                     </StackPanel>
@@ -576,7 +576,7 @@
                     <!-- Rubber-band (click and drag) selection rectangle -->
                     <Canvas x:Name="BandCanvas" IsHitTestVisible="False" ClipToBounds="True">
                         <Border x:Name="BandRect" Visibility="Collapsed" CornerRadius="3" BorderThickness="1"
-                                Background="#2E4C9BFF" BorderBrush="#D04C9BFF"/>
+                                Background="{DynamicResource AccentSoft}" BorderBrush="{DynamicResource Accent}"/>
                     </Canvas>
                 </Grid>
             </Grid>

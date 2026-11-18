@@ -15,6 +15,8 @@
         <SolidColorBrush x:Key="CardBorder" Color="#16FFFFFF"/>
         <SolidColorBrush x:Key="CardHover" Color="#1AFFFFFF"/>
         <SolidColorBrush x:Key="CardSelected" Color="#2E4C9BFF"/>
+        <SolidColorBrush x:Key="AccentSoft" Color="#2E4C9BFF"/>
+        <SolidColorBrush x:Key="AccentLine" Color="#804C9BFF"/>
         <SolidColorBrush x:Key="ControlBg" Color="#12FFFFFF"/>
         <SolidColorBrush x:Key="ControlBorder" Color="#1FFFFFFF"/>
         <SolidColorBrush x:Key="TextPrimary" Color="#EEF3FB"/>
@@ -164,7 +166,7 @@
                     <Setter Property="Background" Value="#14FFFFFF"/>
                 </Trigger>
                 <DataTrigger Binding="{Binding IsActive}" Value="True">
-                    <Setter Property="Background" Value="{StaticResource AccentGradient}"/>
+                    <Setter Property="Background" Value="{DynamicResource AccentGradient}"/>
                     <Setter Property="Foreground" Value="White"/>
                 </DataTrigger>
             </Style.Triggers>
@@ -174,7 +176,7 @@
         <Style x:Key="SearchBox" TargetType="TextBox">
             <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
             <Setter Property="CaretBrush" Value="White"/>
-            <Setter Property="SelectionBrush" Value="{StaticResource Accent}"/>
+            <Setter Property="SelectionBrush" Value="{DynamicResource Accent}"/>
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -196,7 +198,7 @@
                                 <Setter TargetName="Hint" Property="Visibility" Value="Visible"/>
                             </Trigger>
                             <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource Accent}"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Accent}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -207,7 +209,7 @@
         <Style x:Key="PlainBox" TargetType="TextBox">
             <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
             <Setter Property="CaretBrush" Value="White"/>
-            <Setter Property="SelectionBrush" Value="{StaticResource Accent}"/>
+            <Setter Property="SelectionBrush" Value="{DynamicResource Accent}"/>
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -221,12 +223,12 @@
         <Style x:Key="DialogBox" TargetType="TextBox">
             <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
             <Setter Property="CaretBrush" Value="White"/>
-            <Setter Property="SelectionBrush" Value="{StaticResource Accent}"/>
+            <Setter Property="SelectionBrush" Value="{DynamicResource Accent}"/>
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
-                        <Border x:Name="Bd" CornerRadius="10" Background="{StaticResource ControlBg}" BorderBrush="{StaticResource Accent}" BorderThickness="1.5" Padding="12,9">
+                        <Border x:Name="Bd" CornerRadius="10" Background="{StaticResource ControlBg}" BorderBrush="{DynamicResource Accent}" BorderThickness="1.5" Padding="12,9">
                             <ScrollViewer x:Name="PART_ContentHost"/>
                         </Border>
                     </ControlTemplate>
@@ -316,8 +318,8 @@
                                 <Setter TargetName="Bd" Property="Background" Value="{StaticResource CardHover}"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource CardSelected}"/>
-                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource Accent}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource CardSelected}"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Accent}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -339,8 +341,8 @@
                                 <Setter TargetName="Bd" Property="Background" Value="{StaticResource CardBg}"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource CardSelected}"/>
-                                <Setter TargetName="Bd" Property="BorderBrush" Value="#804C9BFF"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource CardSelected}"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource AccentLine}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -358,7 +360,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ContextMenu">
-                        <Border Margin="10" Background="{StaticResource MenuBg}" CornerRadius="12" BorderBrush="#2AFFFFFF" BorderThickness="1" Padding="0,5" MinWidth="230">
+                        <Border Margin="10" Background="{DynamicResource MenuBg}" CornerRadius="12" BorderBrush="#2AFFFFFF" BorderThickness="1" Padding="0,5" MinWidth="230">
                             <Border.Effect>
                                 <DropShadowEffect BlurRadius="20" ShadowDepth="4" Opacity="0.55" Color="Black"/>
                             </Border.Effect>
@@ -385,7 +387,7 @@
                                 <TextBlock x:Name="Glyph" Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" FontFamily="{StaticResource Icons}"
                                            FontSize="13" VerticalAlignment="Center" Foreground="{StaticResource TextSecondary}"/>
                                 <TextBlock x:Name="Check" Text="&#xE73E;" FontFamily="{StaticResource Icons}" FontSize="13" VerticalAlignment="Center"
-                                           Foreground="{StaticResource Accent}" Visibility="Collapsed"/>
+                                           Foreground="{DynamicResource Accent}" Visibility="Collapsed"/>
                                 <ContentPresenter Grid.Column="1" ContentSource="Header" RecognizesAccessKey="True" VerticalAlignment="Center"/>
                                 <TextBlock Grid.Column="2" Text="{TemplateBinding InputGestureText}" Margin="28,0,0,0" FontSize="12"
                                            Foreground="{StaticResource TextTertiary}" VerticalAlignment="Center"/>
@@ -428,9 +430,51 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ToolTip">
-                        <Border Background="{StaticResource MenuBg}" CornerRadius="8" BorderBrush="#2AFFFFFF" BorderThickness="1" Padding="10,6" Margin="6">
+                        <Border Background="{DynamicResource MenuBg}" CornerRadius="8" BorderBrush="#2AFFFFFF" BorderThickness="1" Padding="10,6" Margin="6">
                             <ContentPresenter/>
                         </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="GlassSlider" TargetType="Slider">
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="IsMoveToPointEnabled" Value="True"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Slider">
+                        <Grid Height="18">
+                            <Border Height="6" CornerRadius="3" Background="#22FFFFFF" VerticalAlignment="Center"/>
+                            <Track x:Name="PART_Track">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="Slider.DecreaseLarge" Focusable="False">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="RepeatButton">
+                                                <Border Height="6" CornerRadius="3,0,0,3" Background="{DynamicResource AccentGradient}"/>
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.DecreaseRepeatButton>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="Slider.IncreaseLarge" Focusable="False">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="RepeatButton">
+                                                <Border Background="Transparent"/>
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.IncreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb Focusable="False">
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Ellipse Width="16" Height="16" Fill="White" Stroke="#40000000" StrokeThickness="1"/>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>

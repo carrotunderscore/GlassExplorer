@@ -92,7 +92,7 @@ namespace GlassExplorer
                     Kind = ItemKind.Drive, Name = DriveLabel(d), FullPath = d.RootDirectory.FullName,
                     UsageText = $"{Fmt.Size(d.TotalFreeSpace)} free of {Fmt.Size(d.TotalSize)}",
                     PercentText = $"{used * 100:0}%", RingDash = dash,
-                    RingBrush = Fmt.Frozen(used > 0.9 ? "#FF6B6B" : "#4C9BFF"),
+                    RingBrush = Fmt.Frozen(used > 0.9 ? "#FF6B6B" : GlassTheme.Current.Accent),
                     UsedStar = new GridLength(used, GridUnitType.Star), FreeStar = new GridLength(1 - used, GridUnitType.Star),
                     ToolTipText = $"{DriveLabel(d)}\nUsed: {Fmt.Size(d.TotalSize - d.TotalFreeSpace)}\nFree: {Fmt.Size(d.TotalFreeSpace)}\nDouble-click to open"
                 });

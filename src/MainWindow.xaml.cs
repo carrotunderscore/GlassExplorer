@@ -353,7 +353,7 @@ namespace GlassExplorer
                     Kind = ItemKind.Drive, Name = DriveLabel(d), FullPath = d.RootDirectory.FullName, Group = "Drives",
                     UsageText = $"{Fmt.Size(d.TotalFreeSpace)} free of {Fmt.Size(d.TotalSize)}",
                     PercentText = $"{used * 100:0}%", RingDash = dash,
-                    RingBrush = Fmt.Frozen(used > 0.9 ? "#FF6B6B" : "#4C9BFF"),
+                    RingBrush = Fmt.Frozen(used > 0.9 ? "#FF6B6B" : GlassTheme.Current.Accent),
                     TypeText = "Drive", SizeText = Fmt.Size(d.TotalSize), ModifiedText = "",
                     ToolTipText = $"{DriveLabel(d)}\n{Fmt.Size(d.TotalFreeSpace)} free of {Fmt.Size(d.TotalSize)}"
                 });
@@ -529,6 +529,7 @@ namespace GlassExplorer
         {
             var m = new ContextMenu();
             m.Items.Add(MI("Show hidden files", "\uE7B3", ToggleHidden, check: settings.ShowHidden));
+            m.Items.Add(OpacityItem());
             m.Items.Add(MI("Default file manager (replace Explorer)", "\uE8B7", ToggleDefault, check: DefaultHandler.IsEnabled()));
             m.Items.Add(new Separator());
             m.Items.Add(MI("New tab", "\uE710", () => _ = NewTab(Home), "Ctrl+T"));
@@ -540,6 +541,28 @@ namespace GlassExplorer
                 "A modern dark-glass file manager for Windows 10.\n\nShortcuts: Ctrl+C/X/V, F2 rename, Delete, Ctrl+Shift+N new folder, " +
                 "Alt+Left/Right/Up, Ctrl+L address bar, Ctrl+F search (Enter searches subfolders), F5 refresh.")));
             ShowMenu(m, (UIElement)s);
+        }
+
+        MenuItem OpacityItem()
+        {
+            var pct = new TextBlock { Width = 38, TextAlignment = TextAlignment.Right, VerticalAlignment = VerticalAlignment.Center,
+                                      Foreground = (Brush)FindResource("TextSecondary"), Text = $"{settings.Opacity * 100:0}%" };
+            var slider = new Slider { Minimum = 0.3, Maximum = 1, Value = System.Math.Clamp(settings.Opacity, 0.3, 1), Width = 160,
+                                      Margin = new Thickness(12, 0, 8, 0), Style = (Style)FindResource("GlassSlider"), VerticalAlignment = VerticalAlignment.Center };
+            slider.ValueChanged += (s, e) =>
+            {
+                double v = System.Math.Round(slider.Value, 2);
+                pct.Text = $"{v * 100:0}%";
+                App.WindowOpacity = v;
+                foreach (var w in Application.Current.Windows.OfType<MainWindow>()) w.settings.Opacity = v;
+                ((App)Application.Current).ApplyTheme();
+            };
+            slider.LostMouseCapture += (s, e) => settings.Save();
+            var row = new StackPanel { Orientation = Orientation.Horizontal };
+            row.Children.Add(new TextBlock { Text = "Opacity", VerticalAlignment = VerticalAlignment.Center });
+            row.Children.Add(slider);
+            row.Children.Add(pct);
+            return new MenuItem { Header = row, Tag = "\uE790", StaysOpenOnClick = true, ToolTip = "How see-through the window is (the bar has its own)" };
         }
 
         async void ToggleHidden()

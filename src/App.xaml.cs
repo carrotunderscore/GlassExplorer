@@ -16,9 +16,33 @@ namespace GlassExplorer
 
         [DllImport("user32.dll")] static extern bool AllowSetForegroundWindow(int pid);
 
+        System.IO.FileSystemWatcher themeWatch;
+        System.Windows.Threading.DispatcherTimer themeDelay;
+
+        /// Colour and opacity come from GlassBar (%LOCALAPPDATA%\ModernGlass\theme.json) and follow it live.
+        /// Explorer's own opacity (⋯ menu), separate from the bar's.
+        public static double WindowOpacity = 0.89;
+
+        public void ApplyTheme()
+        {
+            GlassTheme.Load();
+            double op = System.Math.Clamp(WindowOpacity, 0.3, 1);
+            GlassTheme.ApplyBrushes(Resources, System.Math.Min(1, op * 1.09));
+            var t = GlassTheme.Tint;
+            Resources["WindowTint"] = Frozen(new System.Windows.Media.SolidColorBrush(GlassTheme.WithAlpha(t, System.Math.Min(1, op * 0.93))));
+            Resources["SidebarTint"] = Frozen(new System.Windows.Media.SolidColorBrush(GlassTheme.WithAlpha(GlassTheme.Scale(t, 0.45), 0.23)));
+        }
+
+        static T Frozen<T>(T f) where T : System.Windows.Freezable { f.Freeze(); return f; }
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+            WindowOpacity = Settings.Load().Opacity;
+            ApplyTheme();
+            themeDelay = new System.Windows.Threading.DispatcherTimer { Interval = System.TimeSpan.FromMilliseconds(120) };
+            themeDelay.Tick += (s, a) => { themeDelay.Stop(); ApplyTheme(); };
+            themeWatch = GlassTheme.Watch(() => Dispatcher.BeginInvoke(() => { themeDelay.Stop(); themeDelay.Start(); }));
             var en = new System.Globalization.CultureInfo("en-US");
             System.Globalization.CultureInfo.DefaultThreadCurrentCulture = en;
             System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = en;
